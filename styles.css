@@ -1,0 +1,104 @@
+/* Scheduler Plugin Styles */
+
+.scheduler-task-item {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	padding: 8px 12px;
+	border: 1px solid var(--background-modifier-border);
+	border-radius: 6px;
+	margin-bottom: 8px;
+	background: var(--background-secondary);
+}
+
+.scheduler-task-item.disabled {
+	opacity: 0.6;
+}
+
+.scheduler-task-info {
+	flex: 1;
+}
+
+.scheduler-task-name {
+	font-weight: 500;
+}
+
+.scheduler-task-schedule {
+	font-size: 0.85em;
+	color: var(--text-muted);
+}
+
+.scheduler-task-actions {
+	display: flex;
+	gap: 4px;
+}
+
+.scheduler-next-run {
+	font-size: 0.8em;
+	color: var(--text-faint);
+	margin-top: 2px;
+}
+
+.scheduler-command-picker {
+	max-height: 300px;
+	overflow-y: auto;
+}
+
+.scheduler-command-item {
+	padding: 6px 10px;
+	cursor: pointer;
+	border-radius: 4px;
+}
+
+.scheduler-command-item:hover {
+	background: var(--background-modifier-hover);
+}
+
+.scheduler-command-item.selected {
+	background: var(--interactive-accent);
+	color: var(--text-on-accent);
+}
+
+.scheduler-modal-section {
+	margin-bottom: 16px;
+}
+
+.scheduler-modal-section h4 {
+	margin-bottom: 8px;
+}
+
+.scheduler-time-inputs {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+
+.scheduler-time-input {
+	width: 60px;
+}
+
+/* Script path input placeholder styling */
+.scheduler-script-input::placeholder {
+	color: var(--text-faint);
+	opacity: 0.6;
+	font-style: italic;
+}
+
+/* File path suggestion dropdown */
+.scheduler-file-suggestion {
+	padding: 6px 10px;
+	cursor: pointer;
+}
+
+.scheduler-file-suggestion:hover {
+	background: var(--background-modifier-hover);
+}
+
+.scheduler-file-suggestion .suggestion-title {
+	font-weight: 500;
+}
+
+.scheduler-file-suggestion .suggestion-note {
+	font-size: 0.85em;
+	color: var(--text-muted);
+}

@@ -1,0 +1,39 @@
+{
+	"name": "scheduler",
+	"version": "1.0.0",
+	"description": "Schedule Obsidian commands to run at specific times or intervals",
+	"main": "main.js",
+	"scripts": {
+		"dev": "bun run esbuild.config.mjs",
+		"lint": "biome check src/",
+		"lint:fix": "biome check --write src/",
+		"format": "biome format --write src/",
+		"build": "bun run esbuild.config.mjs production",
+		"stage:local:prep": "dotenv -- mkdir -p \"$DEPLOY_DIR\"",
+		"stage:local": "dotenv -- cp main.js manifest.json styles.css \"$DEPLOY_DIR\"",
+		"deploy:local": "dotenv -- sh -c 'bun run --sequential stage:local:prep stage:local'",
+		"deploy": "dotenv -- bun run --sequential lint:fix build deploy:local"
+	},
+	"keywords": [
+		"obsidian",
+		"plugin",
+		"scheduler",
+		"cron",
+		"automation"
+	],
+	"author": "",
+	"license": "MIT",
+	"devDependencies": {
+		"@biomejs/biome": "^2.4.6",
+		"@types/node": "^25.3.0",
+		"builtin-modules": "3.2.0",
+		"esbuild": "^0.27.3",
+		"obsidian": "latest",
+		"tslib": "2.4.0",
+		"typescript": "4.7.4"
+	},
+	"dependencies": {
+		"cron-parser": "^5.5.0",
+		"dotenv-cli": "^11.0.0"
+	}
+}
