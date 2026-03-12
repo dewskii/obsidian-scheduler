@@ -14,7 +14,7 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 	display(): void {
 		const { containerEl } = this;
 		containerEl.empty();
-		new Setting(containerEl).setName("Scheduled Tasks").setHeading();
+		new Setting(containerEl).setName("Scheduled tasks").setHeading();
 
 		new Setting(containerEl).setDesc(
 			"Schedule Obsidian commands to run automatically at specific times or intervals. " +
@@ -34,7 +34,7 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 
 		new Setting(containerEl).addButton((btn) =>
 			btn
-				.setButtonText("Add Task")
+				.setButtonText("Add task")
 				.setCta()
 				.onClick(() => {
 					new TaskModal(this.app, null, async (task) => {
@@ -54,10 +54,10 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 				}),
 		);
 
-		new Setting(containerEl).setName("Settings").setHeading();
+		new Setting(containerEl).setName("General").setHeading();
 
 		new Setting(containerEl)
-			.setName("Show Notifications")
+			.setName("Show notifications")
 			.setDesc("Display a notice when scheduled tasks run")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.showNotifications).onChange(async (value) => {
@@ -67,7 +67,7 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Show Ribbon Buttons")
+			.setName("Show ribbon buttons")
 			.setDesc("Show ribbon buttons for adding and running tasks")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.showRibbonButtons).onChange(async (value) => {
@@ -78,7 +78,7 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 			);
 
 		new Setting(containerEl)
-			.setName("Debug Mode")
+			.setName("Debug mode")
 			.setDesc("Log scheduler activity to the console")
 			.addToggle((toggle) =>
 				toggle.setValue(this.plugin.settings.debugMode).onChange(async (value) => {
@@ -98,9 +98,7 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 		const nameEl = infoEl.createDiv({ cls: "scheduler-task-name" });
 		nameEl.createSpan({
 			text: task.enabled ? "●" : "○",
-			attr: {
-				style: `color: ${task.enabled ? "var(--text-success)" : "var(--text-muted)"}; margin-right: 8px;`,
-			},
+			cls: task.enabled ? "scheduler-status-enabled" : "scheduler-status-disabled",
 		});
 		nameEl.createSpan({ text: task.name });
 

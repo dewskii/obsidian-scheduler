@@ -33,13 +33,13 @@ export default class SchedulerPlugin extends Plugin {
 			id: "add-scheduled-task",
 			name: "Add scheduled task",
 			callback: () => {
-				new TaskModal(this.app, null, async (task) => {
-					// Prevent immediate "missed" trigger
+				new TaskModal(this.app, null, (task) => {
 					task.lastRun = Date.now();
 					this.settings.tasks.push(task);
-					await this.saveSettings();
-					this.restartScheduler();
-					new Notice(`Scheduled: "${task.name}"`);
+					void this.saveSettings().then(() => {
+						this.restartScheduler();
+						new Notice(`Scheduled: "${task.name}"`);
+					});
 				}).open();
 			},
 		});
@@ -110,7 +110,7 @@ export default class SchedulerPlugin extends Plugin {
 
 		try {
 			if (task.type === "command") {
-				await this.executeCommand(task);
+				this.executeCommand(task);
 			} else if (task.type === "script") {
 				await this.executeScript(task);
 			}
@@ -127,7 +127,7 @@ export default class SchedulerPlugin extends Plugin {
 		}
 	}
 
-	private async executeCommand(task: ScheduledTask): Promise<void> {
+	private executeCommand(task: ScheduledTask): void {
 		const commandId = task.target;
 
 		// @ts-expect-error - executeCommandById exists but isn't in types
@@ -157,7 +157,8 @@ export default class SchedulerPlugin extends Plugin {
 			await scriptFn(this.app, Notice);
 			this.log(`Executed script: ${scriptPath}`);
 		} catch (error) {
-			throw new Error(`Script execution failed: ${error}`);
+			const message = error instanceof Error ? error.message : String(error);
+			throw new Error(`Script execution failed: ${message}`);
 		}
 	}
 
@@ -179,23 +180,24 @@ export default class SchedulerPlugin extends Plugin {
 		// Add ribbons if setting is enabled
 		if (this.settings.showRibbonButtons) {
 			this.addTaskRibbonEl = this.addRibbonIcon("calendar-clock", "Add scheduled task", () => {
-				new TaskModal(this.app, null, async (task) => {
+				new TaskModal(this.app, null, (task) => {
 					task.lastRun = Date.now();
 					this.settings.tasks.push(task);
-					await this.saveSettings();
-					this.restartScheduler();
-					new Notice(`Scheduled: "${task.name}"`);
+					void this.saveSettings().then(() => {
+						this.restartScheduler();
+						new Notice(`Scheduled: "${task.name}"`);
+					});
 				}).open();
 			});
-			this.runTaskRibbonEl = this.addRibbonIcon("play", "Run task ad-hoc", () =>
-				this.openRunTaskModal(),
-			);
+			this.runTaskRibbonEl = this.addRibbonIcon("play", "Run task ad-hoc", () => {
+				this.openRunTaskModal();
+			});
 		}
 	}
 
 	private log(message: string): void {
 		if (this.settings.debugMode) {
-			console.log(`[Scheduler] ${message}`);
+			console.debug(`[Scheduler] ${message}`);
 		}
 	}
 }

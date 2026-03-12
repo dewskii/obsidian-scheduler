@@ -16,7 +16,6 @@ export class FilePathSuggest extends AbstractInputSuggest<TFile> {
 
 		return files
 			.filter((file) => {
-				// Filter by .js
 				if (!file.path.endsWith(this.fileExtension)) {
 					return false;
 				}
@@ -24,7 +23,6 @@ export class FilePathSuggest extends AbstractInputSuggest<TFile> {
 				return file.path.toLowerCase().contains(lowerInput);
 			})
 			.sort((a, b) => {
-				// Lazy path length sorting
 				const aPath = a.path.toLowerCase();
 				const bPath = b.path.toLowerCase();
 
@@ -41,11 +39,10 @@ export class FilePathSuggest extends AbstractInputSuggest<TFile> {
 	renderSuggestion(file: TFile, el: HTMLElement): void {
 		el.addClass("scheduler-file-suggestion");
 
-		// Show file name prominently
 		const nameEl = el.createDiv({ cls: "suggestion-title" });
 		nameEl.setText(file.basename);
 
-		// Show full path in smaller text
+
 		const pathEl = el.createDiv({ cls: "suggestion-note" });
 		pathEl.setText(file.path);
 	}

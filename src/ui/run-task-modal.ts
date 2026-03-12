@@ -21,11 +21,11 @@ export class RunTaskModal extends SuggestModal<ScheduledTask> {
 		const container = el.createDiv({ cls: "scheduler-run-task-item" });
 
 		const statusIcon = task.enabled ? "●" : "○";
-		const statusColor = task.enabled ? "var(--text-success)" : "var(--text-muted)";
+		const statusCls = task.enabled ? "scheduler-status-enabled" : "scheduler-status-disabled";
 
 		container.createSpan({
 			text: statusIcon,
-			attr: { style: `color: ${statusColor}; margin-right: 8px;` },
+			cls: `scheduler-status-icon ${statusCls}`,
 		});
 
 		container.createSpan({ text: task.name });
@@ -34,26 +34,21 @@ export class RunTaskModal extends SuggestModal<ScheduledTask> {
 		container.createSpan({
 			text: typeLabel,
 			cls: "scheduler-run-task-type",
-			attr: {
-				style: "margin-left: auto; color: var(--text-muted); font-size: 0.85em;",
-			},
 		});
 	}
 
-	async onChooseSuggestion(task: ScheduledTask, _evt: MouseEvent | KeyboardEvent): Promise<void> {
-		try {
-			await this.onRun(task);
-		} catch (_error) {
+	onChooseSuggestion(task: ScheduledTask, _evt: MouseEvent | KeyboardEvent): void {
+		void this.onRun(task).catch((_error) => {
+			console.error(_error);
 			new Notice(`Failed to run "${task.name}"`);
-		}
+		});
 	}
 
 	onNoSuggestion(): void {
 		this.resultContainerEl.empty();
 		this.resultContainerEl.createDiv({
 			text: "No tasks configured. Add tasks in the plugin settings.",
-			cls: "suggestion-empty",
-			attr: { style: "padding: 10px; color: var(--text-muted);" },
+			cls: "suggestion-empty scheduler-no-tasks",
 		});
 	}
 }

@@ -11,9 +11,9 @@ Tasks can be scheduled using either an existing command, or you're own javascrip
 
 ## Quick start
 Basic scheduled command setup
-1. Go to **Settings → Scheduler**
-2. Click **Add Task**
-3. Pick a command or script, set your schedule
+1. Click the scheduler calendar icon in the ribbon bar
+2. Pick a command or script, set your schedule
+3. Optionally, execute you script adhoc
 
 ## User scripts
 Plugin supports custom user scripts as well. Scripts have full access to the Obsidian API.

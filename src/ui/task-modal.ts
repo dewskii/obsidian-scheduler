@@ -29,9 +29,9 @@ export class TaskModal extends Modal {
 		contentEl.empty();
 		contentEl.addClass("scheduler-modal");
 
-		contentEl.createEl("h2", { text: this.isNew ? "New Scheduled Task" : "Edit Scheduled Task" });
+		contentEl.createEl("h2", { text: this.isNew ? "New scheduled task" : "Edit scheduled task" });
 
-		new Setting(contentEl).setName("Task Name").addText((text) =>
+		new Setting(contentEl).setName("Task name").addText((text) =>
 			text
 				.setPlaceholder("My scheduled task")
 				.setValue(this.task.name)
@@ -50,12 +50,12 @@ export class TaskModal extends Modal {
 			);
 
 		new Setting(contentEl)
-			.setName("Task Type")
+			.setName("Task type")
 			.setDesc("What to execute")
 			.addDropdown((dropdown) =>
 				dropdown
-					.addOption("command", "Obsidian Command")
-					.addOption("script", "JavaScript File")
+					.addOption("command", "Obsidian command")
+					.addOption("script", "JavaScript file")
 					.setValue(this.task.type)
 					.onChange((value) => {
 						this.task.type = value as "command" | "script";
@@ -72,7 +72,7 @@ export class TaskModal extends Modal {
 
 		new Setting(contentEl).setName("Schedule").setHeading();
 
-		new Setting(contentEl).setName("Schedule Type").addDropdown((dropdown) =>
+		new Setting(contentEl).setName("Schedule type").addDropdown((dropdown) =>
 			dropdown
 				.addOption("daily", "Daily at specific time")
 				.addOption("interval", "Every X minutes")
@@ -92,7 +92,6 @@ export class TaskModal extends Modal {
 			this.renderCronSchedule(contentEl);
 		}
 
-		// Run on Missed
 		new Setting(contentEl)
 			.setName("Run if missed")
 			.setDesc("Execute this task on startup if it was missed while Obsidian was closed")
@@ -102,7 +101,6 @@ export class TaskModal extends Modal {
 				}),
 			);
 
-		// Action Buttons
 		new Setting(contentEl)
 			.addButton((btn) =>
 				btn.setButtonText("Cancel").onClick(() => {
@@ -115,7 +113,6 @@ export class TaskModal extends Modal {
 					.setCta()
 					.onClick(() => {
 						if (!this.task.target) {
-							// Show error
 							return;
 						}
 						this.onSave(this.task);
@@ -142,7 +139,6 @@ export class TaskModal extends Modal {
 			});
 		});
 
-		// Show currently selected command info
 		if (this.task.target) {
 			const selected = this.commands.find((c) => c.id === this.task.target);
 			if (selected) {
@@ -153,20 +149,18 @@ export class TaskModal extends Modal {
 
 	private renderScriptPicker(containerEl: HTMLElement): void {
 		new Setting(containerEl)
-			.setName("Script Path")
+			.setName("Script path")
 			.setDesc(
 				"Path to JavaScript file (relative to vault root). Script receives 'app' and 'Notice'.",
 			)
 			.addText((text) => {
 				text.setPlaceholder("templates/scripts/my-script.js");
 				text.setValue(this.task.target);
-				text.inputEl.style.width = "100%";
 				text.inputEl.addClass("scheduler-script-input");
 				text.onChange((value) => {
 					this.task.target = value;
 				});
 
-				// Attach fuzzy file suggester
 				new FilePathSuggest(this.app, text.inputEl, ".js");
 
 				return text;
@@ -189,24 +183,16 @@ export class TaskModal extends Modal {
 					}),
 			);
 
-		// Days of week
 		new Setting(containerEl)
-			.setName("Days of Week")
+			.setName("Days of week")
 			.setDesc("Leave empty for every day, or select specific days");
 
 		const daysContainer = containerEl.createDiv({ cls: "scheduler-days-container" });
-		daysContainer.style.display = "flex";
-		daysContainer.style.gap = "8px";
-		daysContainer.style.marginBottom = "16px";
-		daysContainer.style.paddingLeft = "16px";
 
 		for (const day of DAYS_OF_WEEK) {
 			const dayEl = daysContainer.createEl("label", {
 				cls: "scheduler-day-checkbox",
 			});
-			dayEl.style.display = "flex";
-			dayEl.style.alignItems = "center";
-			dayEl.style.gap = "4px";
 
 			const checkbox = dayEl.createEl("input", { type: "checkbox" });
 			checkbox.checked = this.task.schedule.daysOfWeek?.includes(day.value) ?? false;
@@ -248,7 +234,7 @@ export class TaskModal extends Modal {
 
 	private renderCronSchedule(containerEl: HTMLElement): void {
 		new Setting(containerEl)
-			.setName("Cron Expression")
+			.setName("Cron expression")
 			.setDesc("Standard cron syntax: minute hour day month weekday")
 			.addText((text) =>
 				text
@@ -261,19 +247,30 @@ export class TaskModal extends Modal {
 
 		// Help text
 		const helpEl = containerEl.createDiv({ cls: "scheduler-cron-help" });
-		helpEl.style.paddingLeft = "16px";
-		helpEl.style.marginBottom = "16px";
-		helpEl.style.fontSize = "0.85em";
-		helpEl.style.color = "var(--text-muted)";
 
-		helpEl.innerHTML = `
-			<div style="margin-bottom: 8px;"><strong>Examples:</strong></div>
-			<div><code>0 0 * * *</code> — Midnight daily</div>
-			<div><code>0 9,17 * * *</code> — 9am and 5pm daily</div>
-			<div><code>0 9 * * 1-5</code> — 9am weekdays</div>
-			<div><code>0 0 1 * *</code> — 1st of each month</div>
-			<div style="margin-top: 8px;"><a href="https://crontab.guru/" target="_blank">crontab.guru</a> — cron helper</div>
-		`;
+		const examplesHeader = helpEl.createDiv({ cls: "scheduler-cron-header" });
+		examplesHeader.createEl("strong", { text: "Examples:" });
+
+		const examples = [
+			["0 0 * * *", "Midnight daily"],
+			["0 9,17 * * *", "9am and 5pm daily"],
+			["0 9 * * 1-5", "9am weekdays"],
+			["0 0 1 * *", "1st of each month"],
+		];
+
+		for (const [cron, desc] of examples) {
+			const exampleEl = helpEl.createDiv();
+			exampleEl.createEl("code", { text: cron });
+			exampleEl.appendText(` — ${desc}`);
+		}
+
+		const linkWrapper = helpEl.createDiv({ cls: "scheduler-cron-link" });
+		linkWrapper.createEl("a", {
+			text: "crontab.guru",
+			href: "https://crontab.guru/",
+			attr: { target: "_blank" },
+		});
+		linkWrapper.appendText(" — cron helper");
 	}
 
 	private getAvailableCommands(): CommandInfo[] {
