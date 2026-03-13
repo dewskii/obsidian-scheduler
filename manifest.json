@@ -1,7 +1,7 @@
 {
 	"id": "scheduler",
 	"name": "Scheduler",
-	"version": "0.2.2",
+	"version": "0.2.3",
 	"minAppVersion": "0.15.0",
 	"description": "Schedule commands or custom javascript to run at specific times or intervals.",
 	"author": "Eric Dew",
