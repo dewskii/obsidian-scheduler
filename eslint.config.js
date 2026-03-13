@@ -17,4 +17,12 @@ export default defineConfig([
       },
     },
   },
+  {
+    files: ["src/main.ts"],
+    rules: {
+      //skip required for passing user provided scripts, followed templater implementation
+      "@typescript-eslint/no-implied-eval": "off",
+      "@typescript-eslint/no-unsafe-call": "off",
+    },
+  },
 ]);

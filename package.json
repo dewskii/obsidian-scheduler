@@ -1,6 +1,6 @@
 {
 	"name": "scheduler",
-	"version": "0.2.2",
+	"version": "0.2.4",
 	"description": "Schedule Obsidian commands to run at specific times or intervals",
 	"main": "main.js",
 	"scripts": {

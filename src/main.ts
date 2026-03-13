@@ -22,7 +22,6 @@ export default class SchedulerPlugin extends Plugin {
 			() => this.settings.debugMode,
 		);
 
-		// Wait for workspace to be ready before starting scheduler
 		this.app.workspace.onLayoutReady(() => {
 			this.scheduler?.start();
 		});
@@ -149,12 +148,10 @@ export default class SchedulerPlugin extends Plugin {
 		// @ts-expect-error - TFile check
 		const scriptContent = await this.app.vault.read(scriptFile);
 
-		// Wrap in async to support top-level await
 		try {
 			const wrappedScript = `return (async (app, Notice) => { ${scriptContent} })(app, Notice)`;
-			// eslint-disable-next-line @typescript-eslint/no-implied-eval -- Dynamic script execution requires Function constructor
+			//skip required for passing user provided scripts, followed templater implementation
 			const scriptFn = new Function("app", "Notice", wrappedScript);
-			// eslint-disable-next-line -- Dynamic script execution
 			await scriptFn(this.app, Notice);
 			this.log(`Executed script: ${scriptPath}`);
 		} catch (error) {
