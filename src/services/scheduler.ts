@@ -23,7 +23,7 @@ export class SchedulerService {
 
 	start(): void {
 		this.log("Starting scheduler service");
-		this.checkMissedTasks();
+		void this.checkMissedTasks();
 		this.startPeriodicCheck();
 	}
 
@@ -42,7 +42,7 @@ export class SchedulerService {
 
 	private startPeriodicCheck(): void {
 		this.checkInterval = setInterval(() => {
-			this.checkScheduledTasks();
+			void this.checkScheduledTasks();
 		}, SCHEDULER_CHECK_INTERVAL);
 	}
 
@@ -88,7 +88,7 @@ export class SchedulerService {
 			if (!lastRun) return true;
 			return prevRun.getTime() > lastRun;
 		} catch (error) {
-			this.log(`Invalid cron for daily task "${task.name}": ${error}`);
+			this.log(`Invalid cron for daily task "${task.name}": ${error instanceof Error ? error.message : String(error)}`);
 			return false;
 		}
 	}
@@ -122,7 +122,7 @@ export class SchedulerService {
 			if (!lastRun) return true;
 			return prevRun.getTime() > lastRun;
 		} catch (error) {
-			this.log(`Invalid cron expression for task "${task.name}": ${error}`);
+			this.log(`Invalid cron expression for task "${task.name}": ${error instanceof Error ? error.message : String(error)}`);
 			return false;
 		}
 	}
@@ -182,7 +182,7 @@ export class SchedulerService {
 
 			return prevScheduled.getTime() > lastRun;
 		} catch (error) {
-			this.log(`Invalid cron expression: ${error}`);
+			this.log(`Invalid cron expression: ${error instanceof Error ? error.message : String(error)}`);
 			return false;
 		}
 	}
@@ -235,7 +235,7 @@ export class SchedulerService {
 
 	private log(message: string): void {
 		if (this.debugMode()) {
-			console.log(`[Scheduler] ${message}`);
+			console.debug(`[Scheduler] ${message}`);
 		}
 	}
 }

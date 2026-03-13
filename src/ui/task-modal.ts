@@ -1,7 +1,13 @@
-import { type App, Modal, Setting } from "obsidian";
+import { type App, type Command, Modal, Setting } from "obsidian";
 import { DAYS_OF_WEEK, DEFAULT_TASK } from "../constants";
 import type { CommandInfo, ScheduledTask } from "../types";
 import { FilePathSuggest } from "./file-path-suggest";
+
+interface AppCommands extends App {
+	commands: {
+		listCommands(): Command[];
+	};
+}
 
 export class TaskModal extends Modal {
 	private task: ScheduledTask;
@@ -94,7 +100,7 @@ export class TaskModal extends Modal {
 
 		new Setting(contentEl)
 			.setName("Run if missed")
-			.setDesc("Execute this task on startup if it was missed while Obsidian was closed")
+			.setDesc("Execute this task on startup")
 			.addToggle((toggle) =>
 				toggle.setValue(this.task.runOnMissed).onChange((value) => {
 					this.task.runOnMissed = value;
@@ -151,7 +157,7 @@ export class TaskModal extends Modal {
 		new Setting(containerEl)
 			.setName("Script path")
 			.setDesc(
-				"Path to JavaScript file (relative to vault root). Script receives 'app' and 'Notice'.",
+				"Path to JavaScript file (relative to vault root)",
 			)
 			.addText((text) => {
 				text.setPlaceholder("templates/scripts/my-script.js");
@@ -249,7 +255,7 @@ export class TaskModal extends Modal {
 		const helpEl = containerEl.createDiv({ cls: "scheduler-cron-help" });
 
 		const examplesHeader = helpEl.createDiv({ cls: "scheduler-cron-header" });
-		examplesHeader.createEl("strong", { text: "Examples:" });
+		examplesHeader.createEl("strong", { text: "Examples" });
 
 		const examples = [
 			["0 0 * * *", "Midnight daily"],
@@ -266,7 +272,7 @@ export class TaskModal extends Modal {
 
 		const linkWrapper = helpEl.createDiv({ cls: "scheduler-cron-link" });
 		linkWrapper.createEl("a", {
-			text: "crontab.guru",
+			text: "Help with crons",
 			href: "https://crontab.guru/",
 			attr: { target: "_blank" },
 		});
@@ -274,20 +280,9 @@ export class TaskModal extends Modal {
 	}
 
 	private getAvailableCommands(): CommandInfo[] {
-		const commands: CommandInfo[] = [];
-
-		// @ts-expect-error - commands.commands is not in types but exists
-		const cmdRegistry = this.app.commands.commands;
-		if (cmdRegistry) {
-			for (const cmd of Object.values(cmdRegistry)) {
-				const command = cmd as { id: string; name: string };
-				commands.push({
-					id: command.id,
-					name: command.name,
-				});
-			}
-		}
-
-		return commands.sort((a, b) => a.name.localeCompare(b.name));
+		return (this.app as AppCommands).commands
+			.listCommands()
+			.map((cmd) => ({ id: cmd.id, name: cmd.name }))
+			.sort((a, b) => a.name.localeCompare(b.name));
 	}
 }

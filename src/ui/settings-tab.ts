@@ -23,7 +23,7 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 
 		if (this.plugin.settings.tasks.length === 0) {
 			containerEl.createEl("p", {
-				text: "No scheduled tasks yet. Click 'Add Task' to create one.",
+				text: "No scheduled tasks click add tasks to create one.",
 				cls: "setting-item-description",
 			});
 		} else {
@@ -37,24 +37,19 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 				.setButtonText("Add task")
 				.setCta()
 				.onClick(() => {
-					new TaskModal(this.app, null, async (task) => {
-						// don't run as soon as it's created
+					new TaskModal(this.app, null, (task) => {
 						task.lastRun = Date.now();
-
 						this.plugin.settings.tasks.push(task);
-
-						await this.plugin.saveSettings();
-
-						this.plugin.restartScheduler();
-
-						this.display();
-
-						new Notice(`Scheduled: "${task.name}"`);
+						void this.plugin.saveSettings().then(() => {
+							this.plugin.restartScheduler();
+							this.display();
+							new Notice(`Scheduled: "${task.name}"`);
+						});
 					}).open();
 				}),
 		);
 
-		new Setting(containerEl).setName("General").setHeading();
+		new Setting(containerEl).setName("Preferences").setHeading();
 
 		new Setting(containerEl)
 			.setName("Show notifications")
@@ -121,19 +116,20 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 		const actionsEl = taskEl.createDiv({ cls: "scheduler-task-actions" });
 
 		const runBtn = actionsEl.createEl("button", { text: "▶", attr: { "aria-label": "Run now" } });
-		runBtn.addEventListener("click", async () => {
-			await this.plugin.executeTask(task);
+		runBtn.addEventListener("click", () => {
+			void this.plugin.executeTask(task);
 		});
 
 		const editBtn = actionsEl.createEl("button", { text: "✎", attr: { "aria-label": "Edit" } });
 		editBtn.addEventListener("click", () => {
-			new TaskModal(this.app, { ...task }, async (updatedTask) => {
+			new TaskModal(this.app, { ...task }, (updatedTask) => {
 				const index = this.plugin.settings.tasks.findIndex((t: ScheduledTask) => t.id === task.id);
 				if (index !== -1) {
 					this.plugin.settings.tasks[index] = updatedTask;
-					await this.plugin.saveSettings();
-					this.plugin.restartScheduler();
-					this.display();
+					void this.plugin.saveSettings().then(() => {
+						this.plugin.restartScheduler();
+						this.display();
+					});
 				}
 			}).open();
 		});
@@ -142,13 +138,14 @@ export class SchedulerSettingsTab extends PluginSettingTab {
 			text: "✕",
 			attr: { "aria-label": "Delete" },
 		});
-		deleteBtn.addEventListener("click", async () => {
+		deleteBtn.addEventListener("click", () => {
 			this.plugin.settings.tasks = this.plugin.settings.tasks.filter(
 				(t: ScheduledTask) => t.id !== task.id,
 			);
-			await this.plugin.saveSettings();
-			this.plugin.restartScheduler();
-			this.display();
+			void this.plugin.saveSettings().then(() => {
+				this.plugin.restartScheduler();
+				this.display();
+			});
 		});
 	}
 

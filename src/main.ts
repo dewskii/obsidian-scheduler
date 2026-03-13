@@ -93,7 +93,7 @@ export default class SchedulerPlugin extends Plugin {
 	}
 
 	async loadSettings(): Promise<void> {
-		const loaded = await this.loadData();
+		const loaded = (await this.loadData()) as Partial<SchedulerSettings> | null;
 		this.settings = { ...DEFAULT_SETTINGS, ...loaded };
 	}
 
@@ -130,7 +130,7 @@ export default class SchedulerPlugin extends Plugin {
 	private executeCommand(task: ScheduledTask): void {
 		const commandId = task.target;
 
-		// @ts-expect-error - executeCommandById exists but isn't in types
+		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- executeCommandById exists but isn't in types
 		const result = this.app.commands.executeCommandById(commandId);
 
 		if (result === false) {
@@ -153,7 +153,9 @@ export default class SchedulerPlugin extends Plugin {
 		// Wrap in async to support top-level await
 		try {
 			const wrappedScript = `return (async (app, Notice) => { ${scriptContent} })(app, Notice)`;
+			// eslint-disable-next-line @typescript-eslint/no-implied-eval -- Dynamic script execution requires Function constructor
 			const scriptFn = new Function("app", "Notice", wrappedScript);
+			// eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Dynamic script execution
 			await scriptFn(this.app, Notice);
 			this.log(`Executed script: ${scriptPath}`);
 		} catch (error) {
