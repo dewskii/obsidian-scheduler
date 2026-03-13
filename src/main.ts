@@ -1,7 +1,7 @@
 import { Notice, Plugin } from "obsidian";
 import { DEFAULT_SETTINGS } from "./constants";
 import { SchedulerService } from "./services/scheduler";
-import type { ScheduledTask, SchedulerSettings } from "./types";
+import type { AppCommands, ScheduledTask, SchedulerSettings } from "./types";
 import { RunTaskModal } from "./ui/run-task-modal";
 import { SchedulerSettingsTab } from "./ui/settings-tab";
 import { TaskModal } from "./ui/task-modal";
@@ -130,8 +130,7 @@ export default class SchedulerPlugin extends Plugin {
 	private executeCommand(task: ScheduledTask): void {
 		const commandId = task.target;
 
-		// eslint-disable-next-line @typescript-eslint/no-unsafe-assignment, @typescript-eslint/no-unsafe-call, @typescript-eslint/no-unsafe-member-access -- executeCommandById exists but isn't in types
-		const result = this.app.commands.executeCommandById(commandId);
+		const result = (this.app as AppCommands).commands.executeCommandById(commandId);
 
 		if (result === false) {
 			throw new Error(`Command "${commandId}" not found or failed to execute`);
@@ -155,7 +154,7 @@ export default class SchedulerPlugin extends Plugin {
 			const wrappedScript = `return (async (app, Notice) => { ${scriptContent} })(app, Notice)`;
 			// eslint-disable-next-line @typescript-eslint/no-implied-eval -- Dynamic script execution requires Function constructor
 			const scriptFn = new Function("app", "Notice", wrappedScript);
-			// eslint-disable-next-line @typescript-eslint/no-unsafe-call -- Dynamic script execution
+			// eslint-disable-next-line -- Dynamic script execution
 			await scriptFn(this.app, Notice);
 			this.log(`Executed script: ${scriptPath}`);
 		} catch (error) {

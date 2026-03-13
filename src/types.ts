@@ -1,3 +1,5 @@
+import { App, Command } from "obsidian";
+
 export interface ScheduledTask {
 	id: string;
 	name: string;
@@ -27,4 +29,11 @@ export interface SchedulerSettings {
 export interface CommandInfo {
 	id: string;
 	name: string;
+}
+
+export interface AppCommands extends App {
+	commands: {
+		listCommands(): Command[];
+		executeCommandById(commandId: string): boolean;
+	};
 }
